@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -49,6 +47,7 @@ import kotlinproject.composeapp.generated.resources.clear_filter
 import kotlinproject.composeapp.generated.resources.img
 import org.example.project.model.WeatherBean
 import org.example.project.ui.MyError
+import org.example.project.ui.WeatherGallery
 import org.example.project.viewmodel.MainViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -86,19 +85,8 @@ fun SearchScreen(
         }
 
 
-        //.filter { it.name.contains(searchText.value, true) }
-        //Permet de remplacer très facilement le RecyclerView. LazyRow existe aussi
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.weight(1f)
-        ) {
-            items(list.size) {
-                PictureRowItem(
-                    data = list[it],
-                    onPictureClick = onPictureClick
-                )
-            }
-        }
+        WeatherGallery(modifier = Modifier.weight(1f), list, onPictureClick = onPictureClick)
+
 
         Row {
             Button(
