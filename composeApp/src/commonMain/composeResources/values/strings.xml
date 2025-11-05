@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">A25_10_ynov_android</string>
+    <string name="bt_load_data">Load data</string>
+    <string name="clear_filter">Clear filter</string>
+</resources>
