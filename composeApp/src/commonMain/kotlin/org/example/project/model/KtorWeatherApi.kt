@@ -16,19 +16,8 @@ import kotlinx.serialization.json.Json
 
 //Suspend sera expliqué dans le chapitre des coroutines
 suspend fun main() {
-    val res = KtorWeatherApi.loadWeathers("Toulouse")
-    for (r in res) {
-        println(r.getResume())
-    }
-    KtorWeatherApi.close()
-}
-
-object KtorWeatherApi {
-    private const val API_URL =
-        "https://api.openweathermap.org/data/2.5"
-
     //Création et réglage du client
-    private val client = HttpClient {
+    val client = HttpClient {
         install(Logging) {
             //(import io.ktor.client.plugins.logging.Logger)
             logger = object : Logger {
@@ -45,10 +34,24 @@ object KtorWeatherApi {
         //engine { proxy = ProxyBuilder.http("monproxy:1234") }
     }
 
+    val res = KtorWeatherApi(client).loadWeathers("Toulouse")
+    for (r in res) {
+        println(r.getResume())
+    }
+    client.close()
+}
+
+class KtorWeatherApi(val httpClient: HttpClient) {
+
+   companion object {
+       private const val API_URL =
+           "https://api.openweathermap.org/data/2.5"
+   }
+
     //GET Le JSON reçu sera parser en List<MuseumObject>,
     //Crash si le JSON ne correspond pas
     suspend fun loadWeathers(cityName: String): List<WeatherBean> {
-        val response = client.get("$API_URL/find?appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr&q=$cityName") {
+        val response = httpClient.get("$API_URL/find?appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr&q=$cityName") {
 //            headers {
 //                append("Authorization", "Bearer YOUR_TOKEN")
 //                append("Custom-Header", "CustomValue")
@@ -68,12 +71,8 @@ object KtorWeatherApi {
     }
 
     //Ferme le Client mais celui ci ne sera plus utilisable. Uniquement pour le main
-    fun close() = client.close()
+    fun close() = httpClient.close()
 
-    //Avancés : Exemple avec Flow
-    //fun getDataFlow() = flow<List<MuseumObject>> {
-    //    emit(client.get(API_URL).body())
-    //}
 }
 
 //DATA CLASS

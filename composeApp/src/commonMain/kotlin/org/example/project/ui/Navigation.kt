@@ -3,7 +3,6 @@ package org.example.project.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,6 +12,7 @@ import kotlinx.serialization.Serializable
 import org.example.project.ui.screens.DetailScreen
 import org.example.project.ui.screens.SearchScreen
 import org.example.project.viewmodel.MainViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 class Routes {
     @Serializable
@@ -29,7 +29,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val navHostController: NavHostController = rememberNavController()
     //viewModel() en dehors de NavHost lie à l'Activité donc partagé entre les écrans
     //viewModel() dans le NavHost lié à la stack d'écran. Une instance par stack d'écran
-    val mainViewModel: MainViewModel = viewModel { MainViewModel() }
+    val mainViewModel: MainViewModel = koinViewModel<MainViewModel>()
 
     //Import version avec Composable
     NavHost(

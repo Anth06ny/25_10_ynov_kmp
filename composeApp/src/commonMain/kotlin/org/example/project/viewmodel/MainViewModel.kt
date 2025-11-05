@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.example.project.model.DescriptionBean
@@ -16,31 +15,31 @@ import org.example.project.model.WeatherBean
 import org.example.project.model.WindBean
 
 suspend fun main() {
-    val viewModel = MainViewModel()
-    viewModel.loadWeathers("Toulouse")
-    //viewModel.loadWeathers("Paris")
-    //attente
-    while (viewModel.runInProgress.value) {
-        delay(500)
-    }
-    //Affichage de la liste et du message d'erreur
-    println("List : ${viewModel.dataList.value}")
-    println("ErrorMessage : ${viewModel.errorMessage.value}")
+//    val viewModel = MainViewModel()
+//    viewModel.loadWeathers("Toulouse")
+//    //viewModel.loadWeathers("Paris")
+//    //attente
+//    while (viewModel.runInProgress.value) {
+//        delay(500)
+//    }
+//    //Affichage de la liste et du message d'erreur
+//    println("List : ${viewModel.dataList.value}")
+//    println("ErrorMessage : ${viewModel.errorMessage.value}")
 
-    //Pour que le programme s'arrête, inutile sur Android
-    KtorWeatherApi.close()
 }
 
-open class MainViewModel(val dispatcher : CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
+open class MainViewModel(
+    val ktorWeatherApi: KtorWeatherApi,
+    val dispatcher : CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
     //MutableStateFlow est une donnée observable
     val dataList = MutableStateFlow(emptyList<WeatherBean>())
     val runInProgress = MutableStateFlow(false)
     val errorMessage = MutableStateFlow("")
 
-//    init {
-//        println("Instanciation de MainViewModel")
-//        loadFakeData()
-//    }
+    init {
+        println("Instanciation de MainViewModel")
+        loadFakeData()
+    }
 
     fun loadFakeData(runInProgress :Boolean = false, errorMessage:String = "" ) {
         this.runInProgress.value = runInProgress
@@ -96,7 +95,7 @@ open class MainViewModel(val dispatcher : CoroutineDispatcher = Dispatchers.IO) 
                 if(cityName.length < 3) {
                     throw Exception("Il faut au moins 3 caratchères")
                 }
-                dataList.value = KtorWeatherApi.loadWeathers(cityName)
+                dataList.value = ktorWeatherApi.loadWeathers(cityName)
             } catch (e: Exception) {
                 e.printStackTrace()
                 errorMessage.value = e.message ?: "Une erreur est survenue"

@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import org.example.project.model.WeatherBean
 
 @Composable
-expect fun WeatherGallery(modifier:Modifier, urlList: List<WeatherBean>, onPictureClick: (WeatherBean)->Unit)
+expect fun WeatherGallery(modifier:Modifier = Modifier, urlList: List<WeatherBean>, onPictureClick: (WeatherBean)->Unit)
 
 //Le composant est réutilisable avec n'importe quelle chaine de caractère
 @Composable

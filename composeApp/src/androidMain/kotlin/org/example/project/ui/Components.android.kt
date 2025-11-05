@@ -11,8 +11,6 @@ import org.example.project.ui.screens.PictureRowItem
 @Composable
 actual fun WeatherGallery(modifier:Modifier, urlList: List<WeatherBean>, onPictureClick: (WeatherBean)->Unit) {
 
-    //.filter { it.name.contains(searchText.value, true) }
-    //Permet de remplacer très facilement le RecyclerView. LazyRow existe aussi
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
