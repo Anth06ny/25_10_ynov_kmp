@@ -26,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +66,13 @@ fun SearchScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        var searchText = rememberSaveable { mutableStateOf("") }
+        var searchText = rememberSaveable { mutableStateOf("Toulouse") }
+
+        LaunchedEffect(""){
+            mainViewModel.loadWeathers("Toulouse")
+        }
+
+
 
         SearchBar(
             searchText = searchText,

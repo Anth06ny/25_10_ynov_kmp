@@ -29,7 +29,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val navHostController: NavHostController = rememberNavController()
     //viewModel() en dehors de NavHost lie à l'Activité donc partagé entre les écrans
     //viewModel() dans le NavHost lié à la stack d'écran. Une instance par stack d'écran
-    val mainViewModel: MainViewModel = koinViewModel<MainViewModel>()
+    val mainViewModel = koinViewModel<MainViewModel>()
 
     //Import version avec Composable
     NavHost(
