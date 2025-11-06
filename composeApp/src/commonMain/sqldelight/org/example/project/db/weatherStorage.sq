@@ -1,0 +1,33 @@
+CREATE TABLE weather (
+    cityname TEXT NOT NULL PRIMARY KEY,
+    json TEXT NOT NULL
+);
+
+-- Insert
+insert:
+INSERT INTO weather(cityname, json)
+VALUES (?, ?);
+
+insertOrReplaceWheater:
+INSERT OR REPLACE INTO weather(cityname, json)
+VALUES (?, ?);
+
+-- Select by cityname
+selectByCityname:
+SELECT * FROM weather
+WHERE cityname = ?;
+
+-- Select all
+selectAll:
+SELECT * FROM weather;
+
+-- Update
+update:
+UPDATE weather
+SET json = ?
+WHERE cityname = ?;
+
+-- Delete
+delete:
+DELETE FROM weather
+WHERE cityname = ?;

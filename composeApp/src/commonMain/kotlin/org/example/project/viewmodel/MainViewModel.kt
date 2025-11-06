@@ -8,6 +8,8 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import org.example.project.db.MyDatabase
 import org.example.project.model.DescriptionBean
 import org.example.project.model.KtorWeatherApi
 import org.example.project.model.TempBean
@@ -30,14 +32,20 @@ suspend fun main() {
 
 open class MainViewModel(
     val ktorWeatherApi: KtorWeatherApi,
-    val dispatcher : CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
+    val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    val myDatabase: MyDatabase
+) : ViewModel() {
+
     //MutableStateFlow est une donnée observable
     val dataList = MutableStateFlow(emptyList<WeatherBean>())
     val runInProgress = MutableStateFlow(false)
     val errorMessage = MutableStateFlow("")
 
+    private val jsonParser = Json { prettyPrint = true }
+    private val weatherStorageQueries = myDatabase.weatherStorageQueries
 
-    fun loadFakeData(runInProgress :Boolean = false, errorMessage:String = "" ) {
+
+    fun loadFakeData(runInProgress: Boolean = false, errorMessage: String = "") {
         this.runInProgress.value = runInProgress
         this.errorMessage.value = errorMessage
 
@@ -88,13 +96,29 @@ open class MainViewModel(
 
         return viewModelScope.launch(dispatcher) {
             try {
-                if(cityName.length < 3) {
+                if (cityName.length < 3) {
                     throw Exception("Il faut au moins 3 caratchères")
                 }
-                dataList.value = ktorWeatherApi.loadWeathers(cityName)
+                val list = ktorWeatherApi.loadWeathers(cityName)
+                dataList.value = list
+
+                //Sauvegarde
+                weatherStorageQueries.transaction {
+                    weatherStorageQueries.insertOrReplaceWheater(
+                        cityName,
+                        jsonParser.encodeToString(list)
+                    )
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 errorMessage.value = e.message ?: "Une erreur est survenue"
+
+                //Je récupère en base s'il existe
+                val weatherDao = weatherStorageQueries.selectByCityname(cityName).executeAsOneOrNull()
+                if(weatherDao != null) {
+                    //je parse le json de la base en List<WeatherBean>
+                    dataList.value = jsonParser.decodeFromString<List<WeatherBean>>(weatherDao.json)
+                }
             } finally {
                 runInProgress.value = false
             }

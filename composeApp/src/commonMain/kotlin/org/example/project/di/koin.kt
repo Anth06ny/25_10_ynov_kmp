@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.serialization.json.Json
 import org.example.project.model.KtorWeatherApi
+import org.example.project.model.databaseModule
 import org.example.project.viewmodel.MainViewModel
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
@@ -22,7 +23,7 @@ import org.koin.dsl.module
 fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
         appDeclaration()
-        modules(apiModule, viewModelModule)
+        modules(apiModule, databaseModule(), viewModelModule)
     }
 
 // Version pour iOS et Desktop

@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeHotReload)
 
     kotlin("plugin.serialization") version "2.1.0"
+    id("app.cash.sqldelight") version "2.1.0"
 }
 
 kotlin {
@@ -25,6 +26,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            linkerOpts("-lsqlite3")
         }
     }
 
@@ -38,6 +40,9 @@ kotlin {
 
             //Si besoin du context
             implementation("io.insert-koin:koin-android:4.1.+")
+
+            //Base de données
+            implementation("app.cash.sqldelight:android-driver:2.1.0")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -74,6 +79,10 @@ kotlin {
             implementation("io.insert-koin:koin-compose:4.1.+")
             implementation("io.insert-koin:koin-compose-viewmodel:4.1.+")
             implementation("io.insert-koin:koin-compose-viewmodel-navigation:4.1.+")
+
+            //Base de données
+            implementation("app.cash.sqldelight:runtime:2.1.0")
+            implementation("app.cash.sqldelight:coroutines-extensions:2.1.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -82,9 +91,13 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation("io.ktor:ktor-client-okhttp:3.2.2")
+
+            implementation("app.cash.sqldelight:sqlite-driver:2.1.0")
         }
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:3.2.2")
+
+            implementation("app.cash.sqldelight:native-driver:2.1.0")
         }
 
     }
@@ -129,6 +142,17 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.example.project"
             packageVersion = "1.0.0"
+        }
+    }
+}
+
+
+//À mettre à la racine. Faire une 1er synchronisation avant d'ajouter ce bloc, à mettre au niveau d'indentation 0
+sqldelight {
+    databases {
+        create("MyDatabase") { //Nom de la classe qui sera généré pour représenter votre base
+            //Ou il doit aller chercher les fichiers .sq
+            packageName.set("org.example.project.db")
         }
     }
 }
