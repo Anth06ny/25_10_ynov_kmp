@@ -6,7 +6,7 @@ import org.example.project.di.initKoin
 
 fun main() = application {
 
-    initKoin().koin
+    initKoin()
 
     Window(
         onCloseRequest = ::exitApplication,

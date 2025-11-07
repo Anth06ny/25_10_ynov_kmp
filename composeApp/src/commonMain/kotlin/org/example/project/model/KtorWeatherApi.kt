@@ -2,51 +2,27 @@ package org.example.project.model
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
 import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import org.example.project.di.initKoin
 
 //Suspend sera expliqué dans le chapitre des coroutines
 suspend fun main() {
-    //Création et réglage du client
-    val client = HttpClient {
-        install(Logging) {
-            //(import io.ktor.client.plugins.logging.Logger)
-            logger = object : Logger {
-                override fun log(message: String) {
-                    println(message)
-                }
-            }
-            level = LogLevel.INFO  // TRACE, HEADERS, BODY, etc.
-        }
-        install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true }, contentType = ContentType.Any)
-        }
-        expectSuccess = true //Exception si code >= 300
-        //engine { proxy = ProxyBuilder.http("monproxy:1234") }
-    }
 
-    val res = KtorWeatherApi(client).loadWeathers("Toulouse")
-    for (r in res) {
-        println(r.getResume())
-    }
-    client.close()
+    val koin = initKoin()
+    val ktorWeatherApi = koin.get<KtorWeatherApi>()
+
+    println(ktorWeatherApi.loadWeathers("Toulouse"))
 }
 
 class KtorWeatherApi(val httpClient: HttpClient) {
 
-   companion object {
-       private const val API_URL =
-           "https://api.openweathermap.org/data/2.5"
-   }
+    companion object {
+        private const val API_URL =
+            "https://api.openweathermap.org/data/2.5"
+    }
 
     //GET Le JSON reçu sera parser en List<MuseumObject>,
     //Crash si le JSON ne correspond pas

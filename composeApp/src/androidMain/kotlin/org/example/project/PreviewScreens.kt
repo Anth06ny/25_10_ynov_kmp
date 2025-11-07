@@ -8,36 +8,55 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import org.example.project.di.apiModule
+import org.example.project.di.viewModelModule
 import org.example.project.model.DescriptionBean
 import org.example.project.model.TempBean
 import org.example.project.model.WeatherBean
 import org.example.project.model.WindBean
+import org.example.project.model.databaseModule
 import org.example.project.ui.MyError
 import org.example.project.ui.screens.DetailScreen
 import org.example.project.ui.screens.SearchScreen
 import org.example.project.ui.theme.AppTheme
 import org.example.project.viewmodel.MainViewModel
+import org.koin.android.ext.koin.androidContext
+import org.koin.compose.KoinApplicationPreview
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun InitKoinForPreview(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    KoinApplicationPreview(application = {
+        androidContext(context)
+        modules(viewModelModule)
+        modules(databaseModule())
+        modules(apiModule)
+    }, content)
+}
 
 
 @Preview(showBackground = true, showSystemUi = true)
 @Preview(
     showBackground = true, showSystemUi = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES or android.content.res.Configuration.UI_MODE_TYPE_NORMAL, locale = "fr"
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL, locale = "fr"
 )
 @Composable
 fun SearchScreenPreview() {
-    //Il faut remplacer NomVotreAppliTheme par le thème de votre application
-    //Utilisé par exemple dans MainActivity.kt sous setContent {...}
-    AppTheme {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            val mainViewModel : MainViewModel = viewModel()
-            mainViewModel.loadFakeData(true, "un message d'erreur")
-            SearchScreen(
-                modifier = Modifier.padding(innerPadding),
-                mainViewModel = mainViewModel
-            )
+
+    InitKoinForPreview {
+        AppTheme {
+            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
+                val mainViewModel: MainViewModel = koinViewModel<MainViewModel>()
+                mainViewModel.loadFakeData(true, "un message d'erreur")
+                SearchScreen(
+                    modifier = Modifier.padding(innerPadding),
+                    mainViewModel = mainViewModel
+                )
+            }
         }
     }
 }
@@ -51,6 +70,7 @@ fun SearchScreenPreview() {
 )
 @Composable
 fun DetailScreenPreview() {
+
     AppTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             DetailScreen(

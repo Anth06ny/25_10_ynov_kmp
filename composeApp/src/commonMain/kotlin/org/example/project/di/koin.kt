@@ -24,7 +24,7 @@ fun initKoin(appDeclaration: KoinAppDeclaration = {}) =
     startKoin {
         appDeclaration()
         modules(apiModule, databaseModule(), viewModelModule)
-    }
+    }.koin
 
 // Version pour iOS et Desktop
 fun initKoin() = initKoin {}

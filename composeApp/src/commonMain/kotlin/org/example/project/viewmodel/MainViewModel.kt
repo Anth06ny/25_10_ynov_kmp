@@ -6,10 +6,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.example.project.db.MyDatabase
+import org.example.project.di.initKoin
 import org.example.project.model.DescriptionBean
 import org.example.project.model.KtorWeatherApi
 import org.example.project.model.TempBean
@@ -17,16 +19,18 @@ import org.example.project.model.WeatherBean
 import org.example.project.model.WindBean
 
 suspend fun main() {
-//    val viewModel = MainViewModel()
-//    viewModel.loadWeathers("Toulouse")
-//    //viewModel.loadWeathers("Paris")
-//    //attente
-//    while (viewModel.runInProgress.value) {
-//        delay(500)
-//    }
-//    //Affichage de la liste et du message d'erreur
-//    println("List : ${viewModel.dataList.value}")
-//    println("ErrorMessage : ${viewModel.errorMessage.value}")
+
+    val koin = initKoin()
+    val viewModel = koin.get<MainViewModel>()
+
+    viewModel.loadWeathers("Toulouse")
+    //attente
+    while (viewModel.runInProgress.value) {
+        delay(500)
+    }
+    //Affichage de la liste et du message d'erreur
+    println("List : ${viewModel.dataList.value}")
+    println("ErrorMessage : ${viewModel.errorMessage.value}")
 
 }
 
@@ -115,7 +119,7 @@ open class MainViewModel(
 
                 //Je récupère en base s'il existe
                 val weatherDao = weatherStorageQueries.selectByCityname(cityName).executeAsOneOrNull()
-                if(weatherDao != null) {
+                if (weatherDao != null) {
                     //je parse le json de la base en List<WeatherBean>
                     dataList.value = jsonParser.decodeFromString<List<WeatherBean>>(weatherDao.json)
                 }
